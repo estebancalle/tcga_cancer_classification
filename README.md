@@ -1,135 +1,105 @@
 
-Este proyecto utiliza secuencias de RNA-Seq, para clasificar tipos de cáncer utilizando Machine Learning Learning.
+### RNA-Seq Cancer Classification with Machine Learning
 
-Todos los datos utilizados se descargaron del proyecto TCGA (https://portal.gdc.cancer.gov/), utilizando la biblioteca R `TCGAbiolinks`.
+Welcome to the RNA-Seq cancer classification project! This repository features a detailed pipeline for classifying cancer types using machine learning techniques. The project spans from data extraction to preprocessing, model training, and evaluation, showcasing practical applications of data science in genomics. Additionally, feature selection algorithms have been implemented to address the high dimensionality of gene data, and exploratory analysis using unsupervised algorithms like t-SNE and UMAP has been conducted to understand the dataset's structure. The resulting model, Random Forest with Boruta, is integrated into the [CanceRClassif Webapp for Cancer Classification](https://github.com/estebancalle/Cancerclassif), a web application designed to classify and detect tumors in RNA-Seq tissue samples.
 
-Se plantean dos pipelines distintos, como modos de clasificación:
+---
 
-- **Binaria**: Tumor o Normal.
-- **Multiclase**: entre 15 tipos de tumores.
+### Project Overview
 
-Ambos pipelines siguen los mismos pasos y procesos, con ligeras modificaciones para ajustar y atender cada caso.
+This project leverages RNA-Seq data from The Cancer Genome Atlas (TCGA) to classify cancer types using machine learning. It includes two classification pipelines:
 
-Cada pipeline está dividido en 9 pasos (scripts). Con el objetivo final de evaluar el desempeño de los distintos algoritmos y su capacidad clasificadora y de generalización.
+- **Binary Classification**: Distinguishes between tumor and normal samples.
+- **Multiclass Classification**: Identifies 15 different types of tumors.
 
+Both pipelines follow similar steps with minor adjustments tailored to each classification task.
 
-----------------------
-## Instrucciones de ejecución:
+---
 
-1. Todos los scripts están en código R. Cada uno, instalará las bibiliotecas necesarias para su ejecución
-2. Escoge el pipeline deseado y abre el archivo `.Rproj` para establecer el directorio de trabajo.
-3. Selecciona el script a ejecutar. El script 1 debe haber sido ejecutado al menos una vez antes.
+### Pipelines and Key Steps
 
-----------------------
+Each pipeline is divided into nine distinct steps, implemented as R scripts. Below is a summary of each step:
 
-##   SCRIPT 1 SET UP, DATA INPUT TCGA DATA, REESTRUCTURATION        
+1. **Setup and Data Extraction**
+   - Environment setup and subdirectory creation.
+   - RNA-Seq data download from TCGA using TCGAbiolinks.
+   - Data restructuring and saving in CSV and RDS formats.
+   - Random sampling of datasets.
+   - Handling specific cancer types for binary and multiclass tasks.
 
-### Descripción
+2. **Exploratory Data Analysis (EDA)**
+   - Summary tables and bar charts of sample counts per tumor type.
+   - Missing value detection and visualization.
 
-1. Preparación del entorno de trabajo y subdirectorios 
-2. Descarga con TCGA biolinks datos RNAseq de distintos tipos de Cáncer del repositorio TCGA.
-3. Reestructuración y guardado de los los datos en combinado y separado en csv y rds.
-4. Sampleo aleatorio y sin reemplazamiento muestras del dataset combinado
-5. Guarda el dataset sampleado y el 
+3. **Train-Test Split**
+   - Stratified partitioning of data (80% train, 20% test).
+   - Calculation of baseline accuracy using the majority class predictor.
 
-En modo multiclase se bajan muestras tumorales de 15 proyectos distintos: BLCA, BRCA, CESC, COAD, HNSC, KIRC, KIRP, LGG, LIHC, LUAD, LUSC, PRAD,
-  OV, STAD, PRAD
-En modo binario se bajan muestras normales y tumorales de 13 proyectos distintos:BLCA, BRCA, CESC, COAD,
-  HNSC, KIRC, KIRP, LIHC, LUAD, LUSC, PRAD, STAD, THCA
+4. **Data Preprocessing**
+   - Filtering of irrelevant genes (quantile < 0.25) and low-variance predictors.
+   - Normalization (centering and scaling).
+   - Applying preprocessing steps to test data.
 
-### ***Notas: 
+5. **Exploratory Clustering**
+   - Clustering analysis using PCA, t-SNE, and UMAP.
+   - Dendrogram and heatmap generation.
 
-- Para poder ejecutar el script en windows, la carpeta del proyecto debe estar en una carpeta raíz.
-TCGAbiolinks extrae los datos de distintas muestras produciendo nombres de carpetas extremadamente largos.
-Windows tiene una limitación de 260 carácteres para nombres de carpeta. 
-Para evitar errores por sobrepasar el limite, ejecuta por ejemplo desde "D:/pipeline/multiclase".
-- Revisa la documentación de TCGAbiolinks más reciente: los parámetros de la query necesarios y la versión de bioconductor funcional, suelen cambiar y actualizarse.
+6. **Feature Selection and Extraction**
+   - Selection of predictors using methods like Boruta, msgl, sPLS-DA, and PCA.
+   - Venn diagram to visualize selected genes across methods.
+   - ![Venn Diagram](link-to-venn-diagram-image)
 
-----------------------
+7. **Model Training**
+   - Training various models: ANN, NB, RF, SVM (radial and linear).
+   - Evaluation using predictions and graphical analysis.
+   - Notes on setting up environments for ANN training using Keras and TensorFlow.
 
-##     SCRIPT 2 EDA PREPROCESSED MERGED DATA        
+8. **Model Comparison and Ensemble**
+   - Loading models and generating predictions.
+   - Comparative analysis of models using various metrics.
+   - Stacking ensemble of top-performing models.
 
-### Descripción
+9. **Generalization Testing**
+   - Testing the best model on new samples.
+   - Generating confusion matrices and performance graphs.
 
-1. Tabla número de muestras por tumor. Total y sampleo. 
-2. Diagrama de barras número de muestras por tumor
-3. Detección valores ausentes
-4. Se guardan los gráficos y tablas resultantes
+---
 
-----------------------  
+### Visual Insights
 
-##     SCRIPT 3 TRAIN AND TEST SPLIT       
+The project includes several visual aids to enhance understanding:
 
-### Descripción
+- **Bar Chart**: Shows the proportion of samples per tumor type, highlighting dataset imbalance:
+   - ![Bar Chart](https://github.com/estebancalle/tcga_cancer_classification/blob/master/Result_plots/plot_num_tumor_sampled.png)
+- **t-SNE Plot**: Displays the data structure, indicating overlap among some tumor types.
+   - ![t-SNE plot](https://github.com/estebancalle/tcga_cancer_classification/blob/master/Result_plots/tsne_plot.png)
+- **Venn Diagram**: Illustrates gene selection differences across algorithms (Boruta, Lasso, sPLS-DA, PCA).
+  - ![Venn Diagram](https://github.com/estebancalle/tcga_cancer_classification/blob/master/Result_plots/FS_Venn_Diagram.png)
 
-1. Partición estratificada de datos en 80% datos train, 20 % datos test. 
-2. Guardar datos train y test.
-3. Tabla de proporciones.
-4. Detección "Accuracy basal" clase mayoritaria como predictor
+### Selected Model and Future Integration
 
-----------------------  
-##     SCRIPT 4 PREPROCESSING TRAIN AND TEST DATA     
+The Random Forest model with Boruta feature selection was identified as the best-performing model based on Kappa and Accuracy metrics. The resulting model, Random Forest with Boruta, is integrated into the [CanceRClassif Webapp for Cancer Classification](https://github.com/estebancalle/Cancerclassif), a web application designed to classify and detect tumors in RNA-Seq tissue samples.
 
-### Descripción 
+---
 
-1. Preprocesamiento del dataset train.
-2. Se realiza filtrado genes irrelevantes -(quantil < 0.25)
-3. Identificación Y filtrado  de predictores (genes) de varianza cercana a cero
-3. Normalización: Center y scale transforman los datos y asegurar que las variables tengan la misma escala y media cero.
-4. Aplicamos el preprocesamiento a Test en base a los parámetros del preprocesamiento de train.
+### Execution Instructions
 
-----------------------  
+To run the pipelines:
 
-##     SCRIPT 5 CLUSTERING EXPLORATORIO      
+1. Ensure all R scripts are in place. Each script will install necessary libraries.
+2. Open the `.Rproj` file to set the working directory.
+3. Execute the scripts in sequence, starting with Script 1.
 
-### Descripción 
+**Windows Users**: Place the project folder in a root directory to avoid path length issues (e.g., `D:/pipeline/multiclass`).
 
-1. Clustering exploratorio datos train: PCA,T-SNE,UMAP
-2. Generamos un dendrograma con las muestras
-3. Creamos heatmaps
+**Note**: 
+- Keep TCGAbiolinks documentation handy for updated parameters and Bioconductor versions.
+- For training the ANN, we use KERAS and TensorFlow. You need to create a simple environment in Miniconda with Python, TensorFlow, and Keras installed. Name this environment "tf". The script will import it if it is named this way. [Installation instructions](https://docs.anaconda.com/free/anaconda/applications/tensorflow/).
 
-----------------------  
+---
 
-##    SCRIPTS 6 FEATURE SELECTION AND FEATURE EXTRACTION
+### Conclusion
 
-### Descripción 
+This project showcases a complete workflow for RNA-Seq data classification using machine learning, highlighting practical skills in data science and genomics. The integration of the best-performing model into an application further demonstrates the project's real-world applicability and user-centric approach. Explore the repository to see the detailed work and potential impact.
 
-1. Selección de predictores (genes) con diversos métodos: Boruta, msgl: Multinomial Sparse Group Lasso, sPLS-DA, PCA.
-2. Guardamos datasets train y test con los predictores seleccionados
-3. Diagrama de Venn
-
-----------------------  
-
-##     SCRIPTS 7 CLASSIFICATION MODELS
-
-### Descripción 
-
-1. Entrenamiento de los distintos modelos en base a las distintas selecciones FS (SECTION 6).
-2. Generamos predicciones y gráficos para evaluar.
-3. Se utilizan los siguientes modelos: ANN, NB, RF, SVM RADIAL, SVM LINEAL
-
-### ***Notas: 
-Para el entrenamiento de la ANN, utilizamos KERAS y Tensorflow. Debes crear un enviroment en miniconda sencillo con la instalación de python, Tensorflow y keras. Llama a dicho environment "tf". El script lo importará si lo llamas así.
-https://docs.anaconda.com/free/anaconda/applications/tensorflow/
-
-
-----------------------  
-
-##    SCRIPT 8 MODELS COMPARATION AND ENSEMBLE
-
-### Descripción 
-
-1. Carga de todos los modelos, predicciones y matrices de confusión
-2. Tablas y gráficos comparativos de distintas métricas de los modelos
-3. Gráficos métricas modelo por tipo de técnica Feature selection
-4. Stacking Ensemble con una selección de los 4 mejores modelos y sus métricas de desempeño 
-5. Tabla con la decisión final del ensemble con la clasificación para muestras test en base a la moda.
-6. Gráficos de las métricas de cada modelo por tipo de técnica Feature selection
-
-
-##     SCRIPT 9 TEST DE GENERALIZACIÓN 2    
-
-### Descripción 
-
-1. Test de generalización con nuevas muestras (Las que no fueron seleccionados en el sampleo del paso 1) y el mejor modelo
-2. Generamos matriz de confusión y un gráfico
+---
