@@ -47,7 +47,7 @@ Each pipeline is divided into nine distinct steps, implemented as R scripts. Bel
 6. **Feature Selection and Extraction**
    - Selection of predictors using methods like Boruta, msgl, sPLS-DA, and PCA.
    - Venn diagram to visualize selected genes across methods.
-   - ![Venn Diagram](link-to-venn-diagram-image)
+   
 
 7. **Model Training**
    - Training various models: ANN, NB, RF, SVM (radial and linear).
